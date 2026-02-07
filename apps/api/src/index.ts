@@ -1,13 +1,17 @@
+import 'dotenv/config' 
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
 import { telemetrySimulation } from './virtual-simulations/telemetry'
-
+import { brokerSubscribe } from './mqtt/mqtt-client'
+ 
 const app = new Hono()
 app.use('/*', cors())
 telemetrySimulation("device-001"); // mock device
+telemetrySimulation("device-002"); // mock device
+brokerSubscribe();
 const route = app
   .get('/', (c) => {
     return c.json({ message: 'Hello Hono!' })
