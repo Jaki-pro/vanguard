@@ -14,8 +14,11 @@
   "license": "ISC",
   "dependencies": {
     "@hono/node-server": "^1.19.9",
+    "@hono/swagger-ui": "^0.5.3",
+    "@hono/zod-openapi": "^1.2.1",
     "@hono/zod-validator": "^0.7.6",
     "@influxdata/influxdb-client": "^1.35.0",
+    "@scalar/hono-api-reference": "^0.9.40",
     "dotenv": "^17.2.4",
     "hono": "^4.11.5",
     "mqtt": "^5.14.1",
