@@ -1,4 +1,7 @@
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import dotenv from "dotenv" 
-export const db = drizzle(process.env.DATABASE_URL!);
+
+
+// Export schema
+export * from './schema';
+// Export auth (NEW)
+export { auth } from './auth';
+export type { Session, User } from './auth';
