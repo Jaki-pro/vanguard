@@ -18,7 +18,6 @@ telemetrySimulation('device-001')
 telemetrySimulation('device-002')
 brokerSubscribe()
 
-
 // Mount telemetry routes
 app.route('/telemetry', telemetryRoute)
 
@@ -28,7 +27,8 @@ app.doc('/openapi.json', {
   info: {
     title: 'Vehicle Telemetry API',
     version: '1.0.0',
-    description: 'API for retrieving vehicle telemetry data from InfluxDB via MQTT broker',
+    description:
+      'API for retrieving vehicle telemetry data from InfluxDB via MQTT broker',
     contact: {
       name: 'API Support',
     },

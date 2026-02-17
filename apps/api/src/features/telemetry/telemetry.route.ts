@@ -13,7 +13,8 @@ const getTelemetryRoute = createRoute({
   path: '/{device_id}',
   tags: ['Telemetry'],
   summary: 'Get device telemetry',
-  description: 'Retrieve the last 100 telemetry data points for a specific device, sorted by timestamp (newest first)',
+  description:
+    'Retrieve the last 100 telemetry data points for a specific device, sorted by timestamp (newest first)',
   request: {
     params: DeviceIdParamSchema,
   },
