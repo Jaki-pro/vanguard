@@ -22,20 +22,15 @@ const INFLUX_URL = process.env.INFLUX_URL!
 const INFLUX_BUCKET = process.env.INFLUX_BUCKET!
 const INFLUX_ORG = process.env.INFLUX_ORG!
 const INFLUX_TOKEN = process.env.INFLUX_TOKEN!
-console.log("INFLUX URL", INFLUX_URL)
+console.log('INFLUX URL', INFLUX_URL)
 const influx = new InfluxDB({
   url: INFLUX_URL,
   token: INFLUX_TOKEN,
 })
 
-const writeApi: WriteApi = influx.getWriteApi(
-  INFLUX_ORG,
-  INFLUX_BUCKET,
-  'ms',
-  {
-    flushInterval: 0, // ⛔ disable auto flush
-  },
-)
+const writeApi: WriteApi = influx.getWriteApi(INFLUX_ORG, INFLUX_BUCKET, 'ms', {
+  flushInterval: 0, // ⛔ disable auto flush
+})
 let messageBuffer: TelemetryPayload[] = []
 export const brokerSubscribe = () => {
   console.log('🔌 MQTT Service: Initializing...')
@@ -58,9 +53,9 @@ export const brokerSubscribe = () => {
   client.on('message', (_, message) => {
     try {
       const payload: TelemetryPayload = JSON.parse(message.toString())
-      messageBuffer.push(payload) 
+      messageBuffer.push(payload)
       console.log(
-        `[Buffer] ${payload.device_id} | size=${messageBuffer.length}`,
+        `[Buffer] ${payload.device_id} | size=${messageBuffer.length}`
       )
     } catch (err) {
       console.error('⚠️ Invalid payload:', err)

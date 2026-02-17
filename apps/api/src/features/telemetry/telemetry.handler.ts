@@ -60,12 +60,15 @@ export const getTelemetryByDeviceId = async (c: Context) => {
       })
     })
 
-    return c.json({
-      success: true,
-      device_id,
-      count: results.length,
-      data: results,
-    }, 200)
+    return c.json(
+      {
+        success: true,
+        device_id,
+        count: results.length,
+        data: results,
+      },
+      200
+    )
   } catch (error) {
     console.error('Error fetching telemetry:', error)
     return c.json(

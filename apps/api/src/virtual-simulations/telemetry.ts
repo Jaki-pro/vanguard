@@ -1,9 +1,9 @@
-import { InfluxDB, Point, WriteApi } from '@influxdata/influxdb-client';
+import { InfluxDB, Point, WriteApi } from '@influxdata/influxdb-client'
 import mqtt from 'mqtt'
 
-const BROKER_URL = process.env.BROKER_URL! 
-export const telemetrySimulation = (device_id:string) => {
-    const TOPIC = `devices/${device_id}/telemetry`
+const BROKER_URL = process.env.BROKER_URL!
+export const telemetrySimulation = (device_id: string) => {
+  const TOPIC = `devices/${device_id}/telemetry`
   const client = mqtt.connect(BROKER_URL, {
     reconnectPeriod: 3000,
   })
