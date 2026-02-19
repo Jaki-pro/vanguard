@@ -7,6 +7,7 @@ import { telemetrySimulation } from './virtual-simulations/telemetry'
 import { brokerSubscribe } from './mqtt/mqtt-client'
 import { telemetryRoute } from './features/telemetry/telemetry.route'
 import { apiReference } from '@scalar/hono-api-reference'
+import { deviceRoute } from './features/device/device.route'
 
 const app = new OpenAPIHono()
 
@@ -20,7 +21,7 @@ brokerSubscribe()
 
 // Mount telemetry routes
 app.route('/telemetry', telemetryRoute)
-
+app.route('/devices', deviceRoute)
 // OpenAPI JSON endpoint
 app.doc('/openapi.json', {
   openapi: '3.1.0',

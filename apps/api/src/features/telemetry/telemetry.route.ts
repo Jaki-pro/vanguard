@@ -8,7 +8,7 @@ import { getTelemetryByDeviceId } from './telemetry.handler'
 
 export const telemetryRoute = new OpenAPIHono()
 
-const getTelemetryRoute = createRoute({
+export const getTelemetryRoute = createRoute({
   method: 'get',
   path: '/{device_id}',
   tags: ['Telemetry'],

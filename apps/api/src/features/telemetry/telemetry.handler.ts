@@ -1,5 +1,6 @@
+import { type RouteHandler } from '@hono/zod-openapi'
 import { InfluxDB } from '@influxdata/influxdb-client'
-import type { Context } from 'hono'
+import type { getTelemetryRoute } from './telemetry.route'
 
 const INFLUX_URL = process.env.INFLUX_URL!
 const INFLUX_BUCKET = process.env.INFLUX_BUCKET!
@@ -11,8 +12,10 @@ const influx = new InfluxDB({
   token: INFLUX_TOKEN,
 })
 
-export const getTelemetryByDeviceId = async (c: Context) => {
-  const { device_id } = c.req.valid('param') as any
+export const getTelemetryByDeviceId: RouteHandler<
+  typeof getTelemetryRoute
+> = async (c) => {
+  const { device_id } = c.req.valid('param')
 
   try {
     const queryApi = influx.getQueryApi(INFLUX_ORG)

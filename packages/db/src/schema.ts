@@ -32,6 +32,7 @@ export const userDevicesTable = pgTable(
     userId: varchar({ length: 255 })
       .notNull()
       .references(() => usersTable.id),
+    type: varchar({ length: 50 }).notNull(),
   },
   (t) => [unique('unique_user_device').on(t.userId, t.deviceId)]
 )

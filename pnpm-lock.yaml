@@ -35,12 +35,18 @@ importers:
       '@influxdata/influxdb-client':
         specifier: ^1.35.0
         version: 1.35.0
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@scalar/hono-api-reference':
         specifier: ^0.9.40
         version: 0.9.40(hono@4.11.5)
       dotenv:
         specifier: ^17.2.4
         version: 17.2.4
+      drizzle-orm:
+        specifier: ^0.45.1
+        version: 0.45.1(@types/pg@8.16.0)(kysely@0.28.11)(pg@8.18.0)(postgres@3.4.8)
       hono:
         specifier: ^4.11.5
         version: 4.11.5
