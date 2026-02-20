@@ -32,11 +32,6 @@ import DeviceSettingsModal from '../../components/DeviceSettingsModal'
 import { useAuth } from '../../hooks/use-auth'
 import { useDeviceTelemetry } from '../../hooks/useDeviceTelemetry'
 
-const TILE_SIZE = 256
-const DHAKA_LAT = 23.7937
-const DHAKA_LNG = 90.4066
-const DEFAULT_ZOOM = 13
-
 const STATUS_COLORS: Record<string, string> = {
   active: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
   offline: 'text-rose-500 bg-rose-500/10 border-rose-500/20',
@@ -44,87 +39,23 @@ const STATUS_COLORS: Record<string, string> = {
   maintenance: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
 }
 
-// --- MOCK DATA GENERATORS ---
-const generateInitialDevices = (): Device[] => [
-  {
-    id: 'DEV-001',
-    name: 'Alpha Drone',
-    type: 'drone',
-    status: 'active',
-    lat: 23.7937,
-    lng: 90.4066,
-    battery: 82,
-    speed: 45,
-    signal: 4,
-    temp: 34,
-    history: [],
-  },
-  {
-    id: 'DEV-002',
-    name: 'Logistics Truck A',
-    type: 'vehicle',
-    status: 'active',
-    lat: 23.8103,
-    lng: 90.4125,
-    battery: 65,
-    speed: 22,
-    signal: 3,
-    temp: 40,
-    history: [],
-  },
-  {
-    id: 'DEV-003',
-    name: 'Gulshan Courier',
-    type: 'bike',
-    status: 'low_battery',
-    lat: 23.7806,
-    lng: 90.4193,
-    battery: 18,
-    speed: 12,
-    signal: 2,
-    temp: 31,
-    history: [],
-  },
-  {
-    id: 'DEV-004',
-    name: 'Sensor Array X1',
-    type: 'sensor',
-    status: 'offline',
-    lat: 23.75,
-    lng: 90.39,
-    battery: 0,
-    speed: 0,
-    signal: 0,
-    temp: 28,
-    history: [],
-  },
-  {
-    id: 'DEV-005',
-    name: 'River Boat Patrol',
-    type: 'boat',
-    status: 'active',
-    lat: 23.76,
-    lng: 90.45,
-    battery: 92,
-    speed: 15,
-    signal: 4,
-    temp: 29,
-    history: [],
-  },
-  {
-    id: 'DEV-006',
-    name: 'Uttara Node',
-    type: 'station',
-    status: 'maintenance',
-    lat: 23.87,
-    lng: 90.38,
-    battery: 100,
-    speed: 0,
-    signal: 5,
-    temp: 36,
-    history: [],
-  },
-]
+// --- HELPERS ---
+
+/** Map signal_strength (dBm, typically -30 to -90) to 0–5 scale */
+const signalToBar = (dbm: number): number => {
+  if (dbm >= -55) return 5
+  if (dbm >= -65) return 4
+  if (dbm >= -75) return 3
+  if (dbm >= -85) return 2
+  return 1
+}
+
+/** Derive status: if battery < 20 and not charging → low_battery */
+const deriveStatus = (raw: string, battery: number, charging: boolean): string => {
+  if (raw === 'offline') return 'offline'
+  if (battery < 20 && !charging) return 'low_battery'
+  return raw
+}
 
 interface ToastProps {
   message: string
@@ -159,7 +90,6 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
   )
 }
 
-// 3. Reusable UI Components
 const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className = '',
@@ -184,8 +114,6 @@ const StatusBadge: React.FC<{ status: string }> = React.memo(({ status }) => {
     </span>
   )
 })
-
-// --- MEMOIZED SIDEBAR ITEM ---
 
 interface SidebarItemProps {
   device: Device
@@ -256,15 +184,16 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(
     </div>
   )
 )
-  type UserDevice = {
-  id: number;
-  deviceId: number;
-  type: string;
-  userId: string;
-  deviceName: string;
-};
+
+type UserDevice = {
+  id: number
+  deviceId: number
+  type: string
+  userId: string
+  deviceName: string
+}
+
 export default function App() {
-  const [devices, setDevices] = useState<Device[]>(generateInitialDevices)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [view, setView] = useState<'dashboard' | 'detail'>('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -274,13 +203,14 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const { isAuthenticated, isLoading, user } = useAuth()
   const [apiDevices, setApiDevices] = useState<UserDevice[]>([])
+
   // Responsive Sidebar Initialization
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) setSidebarOpen(false)
       else setSidebarOpen(true)
     }
-    handleResize() // Init
+    handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -307,10 +237,7 @@ export default function App() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        notifRef.current &&
-        !notifRef.current.contains(event.target as Node)
-      ) {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
         setShowNotifications(false)
       }
     }
@@ -340,48 +267,31 @@ export default function App() {
     },
     []
   )
+
   // CRUD HANDLERS
   const handleAddDevice = async (data: { type: string; id: string }) => {
     const API_URL = 'http://localhost:3001/devices/assign'
-
-    // 1. Prepare the payload
     const newDevice = {
       deviceId: parseInt(data.id, 10),
       userId: user?.id,
       type: data.type,
     }
-    console.log('Adding Device with Data:', newDevice)
     try {
-      // 2. Execute the API Request
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newDevice),
       })
-      console.log('API Response:', response)
-      // 3. Check for server-side errors
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(errorData.message || 'Failed to assign device')
       }
-
-      const savedDevice = await response.json()
-
-      // 4. Update UI State only on success
-      // Use the data returned from the server (savedDevice) if available
-      //setDevices((prev) => [...prev, savedDevice || newDevice]);
-
       showToast(`Device ${newDevice.deviceId} added successfully!`, 'success')
       setIsAddDeviceOpen(false)
+      // Re-fetch devices so new device appears
+      fetchDevices()
     } catch (error: any) {
-      // 5. Handle Failures
-      console.error('Add Device Error:', error)
-      showToast(
-        error.message || 'Network error: Could not add device.',
-        'error'
-      )
+      showToast(error.message || 'Network error: Could not add device.', 'error')
     }
   }
 
@@ -391,65 +301,123 @@ export default function App() {
     try {
       const res = await fetch(`${API_BASE}/devices/user/${user.id}`)
       if (!res.ok) throw new Error('Failed to fetch devices')
-
       const result = await res.json()
       const rawData: UserDevice[] = result.data || result
-
       setApiDevices(rawData)
     } catch (error: any) {
-      console.error('Fetch devices error:', error)
       showToast(error.message || 'Failed to load your devices', 'error')
     } finally {
       setLoading(false)
     }
   }, [user?.id])
+
   useEffect(() => {
     if (user?.id) {
       fetchDevices()
     }
   }, [user?.id, fetchDevices])
-  const telemetryData = useDeviceTelemetry(apiDevices);
-  console.log('Telemetry Data:', telemetryData) // Debugging telemetry data
+
+  // Real-time telemetry from custom hook (keyed by deviceId number)
+  const telemetryData = useDeviceTelemetry(apiDevices)
+
+  // --- CORE: Derive Device[] from telemetry + apiDevices metadata ---
+  const devices = useMemo<Device[]>(() => {
+    if (!apiDevices.length) return []
+
+    return apiDevices.map((apiDev) => {
+      const telemetry = telemetryData[apiDev.deviceId]
+
+      // If no telemetry yet, show device as offline with defaults
+      if (!telemetry) {
+        return {
+          id: String(apiDev.deviceId),
+          name: apiDev.deviceName || `Device ${apiDev.deviceId}`,
+          type: apiDev.type || 'sensor',
+          status: 'offline',
+          lat: 0,
+          lng: 0,
+          battery: 0,
+          speed: 0,
+          signal: 0,
+          temp: 0,
+          history: [],
+        }
+      }
+
+      const battery = telemetry.battery_level ?? 0
+      const charging = telemetry.charging ?? false
+      const status = deriveStatus(telemetry.status ?? 'offline', battery, charging)
+
+      // Emit low battery notification (side-effect safe: only on status derived)
+      if (status === 'low_battery') {
+        // We can't call addNotification in useMemo — handled in useEffect below
+      }
+
+      return {
+        id: String(apiDev.deviceId),
+        name: apiDev.deviceName || `Device ${apiDev.deviceId}`,
+        type: apiDev.type || 'sensor',
+        status,
+        lat: telemetry.latitude ?? 0,
+        lng: telemetry.longitude ?? 0,
+        battery,
+        speed: Math.round(telemetry.speed ?? 0),
+        signal: signalToBar(telemetry.signal_strength ?? -90),
+        temp: telemetry.temperature ?? 0,
+        altitude: telemetry.altitude,
+        heading: telemetry.heading,
+        satellites: telemetry.satellites,
+        accuracy: telemetry.accuracy,
+        charging,
+        history: [],
+      }
+    })
+  }, [apiDevices, telemetryData])
+
+  // Low battery notifications (derived from devices, side-effect safe)
+  const prevLowBatteryRef = useRef<Set<string>>(new Set())
+  useEffect(() => {
+    devices.forEach((d) => {
+      if (d.status === 'low_battery' && !prevLowBatteryRef.current.has(d.id)) {
+        addNotification('Low Battery Warning', `${d.name} is at ${d.battery}%`, 'warn')
+        prevLowBatteryRef.current.add(d.id)
+      }
+      if (d.status !== 'low_battery') {
+        prevLowBatteryRef.current.delete(d.id)
+      }
+    })
+  }, [devices])
+
+  // handleUpdateDevice: optimistic local override (settings saved)
+  // Since devices are derived from telemetry, overrides reset on next telemetry tick.
+  // For name/type we update apiDevices (or POST to API); for status we track overrides.
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({})
+
   const handleUpdateDevice = (updatedDevice: Device) => {
-    setDevices((prev) =>
-      prev.map((d) => (d.id === updatedDevice.id ? updatedDevice : d))
+    // Persist name/type changes via API if needed; here we optimistically update apiDevices
+    setApiDevices((prev) =>
+      prev.map((d) =>
+        String(d.deviceId) === updatedDevice.id
+          ? { ...d, deviceName: updatedDevice.name, type: updatedDevice.type }
+          : d
+      )
     )
     showToast(`Configuration for ${updatedDevice.name} updated`, 'success')
     setIsSettingsOpen(false)
   }
 
   const handleUpdateStatus = useCallback((id: string, status: string) => {
-    setDevices((prev) => prev.map((d) => (d.id === id ? { ...d, status } : d)))
+    setStatusOverrides((prev) => ({ ...prev, [id]: status }))
   }, [])
- 
-  // Real-time Simulation Loop
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 800)
-    const interval = setInterval(() => {
-      setDevices((prev) =>
-        prev.map((d) => {
-          if (d.status === 'offline') return d
-          if (Math.random() < 0.02 && d.battery < 15) {
-            addNotification(
-              'Low Battery Warning',
-              `${d.name} is at ${d.battery}%`,
-              'warn'
-            )
-          }
-          return {
-            ...d,
-            lat: d.lat + (Math.random() - 0.5) * 0.001,
-            lng: d.lng + (Math.random() - 0.5) * 0.001,
-            battery:
-              d.battery > 0 ? parseFloat((d.battery - 0.1).toFixed(1)) : 0,
-            speed: Math.floor(Math.max(0, d.speed + (Math.random() - 0.5) * 5)),
-            history: d.history,
-          }
-        })
-      )
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
+
+  // Apply status overrides on top of telemetry-derived devices
+  const devicesWithOverrides = useMemo<Device[]>(
+    () =>
+      devices.map((d) =>
+        statusOverrides[d.id] ? { ...d, status: statusOverrides[d.id] } : d
+      ),
+    [devices, statusOverrides]
+  )
 
   const handleDeviceSelect = useCallback((id: string) => {
     setSelectedId(id)
@@ -463,8 +431,8 @@ export default function App() {
   }, [])
 
   const activeDevice = useMemo(
-    () => devices.find((d) => d.id === selectedId) || devices[0],
-    [devices, selectedId]
+    () => devicesWithOverrides.find((d) => d.id === selectedId) || devicesWithOverrides[0],
+    [devicesWithOverrides, selectedId]
   )
 
   if (loading)
@@ -482,8 +450,7 @@ export default function App() {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
       `}</style>
 
-      {/* 1. PERSISTENT SIDEBAR */}
-      {/* Removed AnimatePresence wrapper to prevent exit animation delay */}
+      {/* SIDEBAR */}
       {sidebarOpen && (
         <motion.aside
           initial={{ x: -320 }}
@@ -491,15 +458,12 @@ export default function App() {
           transition={{ duration: 0.3, ease: 'easeOut' }}
           className="fixed inset-y-0 left-0 z-50 w-80 bg-slate-900/95 backdrop-blur-xl border-r border-slate-700/50 flex flex-col shadow-2xl lg:relative lg:translate-x-0"
         >
-          {/* Header */}
           <div className="p-5 border-b border-slate-700/50 flex items-center justify-between bg-slate-900/50">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/50">
                 <Activity className="text-white" size={20} />
               </div>
-              <span className="font-bold text-lg tracking-tight text-white">
-                TrackFlow
-              </span>
+              <span className="font-bold text-lg tracking-tight text-white">TrackFlow</span>
             </Link>
             <div className="flex items-center gap-1">
               <button
@@ -509,7 +473,6 @@ export default function App() {
               >
                 <Plus size={18} />
               </button>
-              {/* Desktop Collapse Button */}
               <button
                 onClick={() => setSidebarOpen(false)}
                 className="p-1.5 hover:bg-slate-800 rounded-md text-slate-400 hidden lg:block"
@@ -517,7 +480,6 @@ export default function App() {
               >
                 <PanelLeftClose size={18} />
               </button>
-              {/* Mobile Close Button */}
               <button
                 onClick={() => setSidebarOpen(false)}
                 className="lg:hidden p-1 hover:bg-slate-800 rounded-md text-slate-400"
@@ -527,13 +489,9 @@ export default function App() {
             </div>
           </div>
 
-          {/* Search */}
           <div className="p-4 border-b border-slate-700/30">
             <div className="relative">
-              <Search
-                className="absolute left-3 top-2.5 text-slate-500"
-                size={14}
-              />
+              <Search className="absolute left-3 top-2.5 text-slate-500" size={14} />
               <input
                 type="text"
                 placeholder="Filter units..."
@@ -542,29 +500,31 @@ export default function App() {
             </div>
           </div>
 
-          {/* Device List (Memoized Items) */}
           <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
-            {devices.map((device) => (
-              <SidebarItem
-                key={device.id}
-                device={device}
-                isSelected={selectedId === device.id}
-                onClick={() => handleDeviceSelect(device.id)}
-                onViewDetails={handleViewDetails}
-              />
-            ))}
+            {devicesWithOverrides.length === 0 ? (
+              <div className="p-6 text-center text-slate-500 text-xs">
+                No devices found. Add a device to get started.
+              </div>
+            ) : (
+              devicesWithOverrides.map((device) => (
+                <SidebarItem
+                  key={device.id}
+                  device={device}
+                  isSelected={selectedId === device.id}
+                  onClick={() => handleDeviceSelect(device.id)}
+                  onViewDetails={handleViewDetails}
+                />
+              ))
+            )}
           </div>
 
-          {/* User Footer */}
           <div className="p-4 border-t border-slate-700/50 bg-slate-900/50">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
                 A
               </div>
               <div>
-                <div className="text-xs font-medium text-white">
-                  Admin Console
-                </div>
+                <div className="text-xs font-medium text-white">Admin Console</div>
                 <div className="text-[10px] text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   System Online
@@ -575,9 +535,8 @@ export default function App() {
         </motion.aside>
       )}
 
-      {/* 2. MAIN CONTENT AREA */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 relative flex flex-col h-full bg-slate-950">
-        {/* Mobile/Desktop Header Toggle */}
         <div className="absolute top-4 left-4 z-40">
           <AnimatePresence>
             {!sidebarOpen && (
@@ -594,21 +553,15 @@ export default function App() {
           </AnimatePresence>
         </div>
 
-        {/* View Switcher */}
         {view === 'dashboard' ? (
           <div className="w-full h-full relative">
             <CustomOSMMap
-              devices={devices}
+              devices={devicesWithOverrides}
               selectedId={selectedId}
               onSelect={handleDeviceSelect}
             />
 
-            {/* Quick Stats & Notification Overlay */}
-            <div
-              className="absolute top-4 right-4 z-30 flex gap-2"
-              ref={notifRef}
-            >
-              {/* Notification Bell */}
+            <div className="absolute top-4 right-4 z-30 flex gap-2" ref={notifRef}>
               <div className="relative">
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
@@ -620,7 +573,6 @@ export default function App() {
                   )}
                 </button>
 
-                {/* Notification Dropdown */}
                 <AnimatePresence>
                   {showNotifications && (
                     <motion.div
@@ -643,10 +595,7 @@ export default function App() {
                       <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                         {notifications.length === 0 ? (
                           <div className="p-8 text-center text-slate-500 text-xs">
-                            <Bell
-                              size={24}
-                              className="mx-auto mb-2 opacity-20"
-                            />
+                            <Bell size={24} className="mx-auto mb-2 opacity-20" />
                             No new notifications
                           </div>
                         ) : (
@@ -661,9 +610,7 @@ export default function App() {
                                 />
                                 <div>
                                   <div className="flex justify-between items-start w-full">
-                                    <h4 className="text-sm font-medium text-slate-200">
-                                      {n.title}
-                                    </h4>
+                                    <h4 className="text-sm font-medium text-slate-200">{n.title}</h4>
                                     <span className="text-[10px] text-slate-600 ml-2 whitespace-nowrap">
                                       {n.time}
                                     </span>
@@ -694,18 +641,12 @@ export default function App() {
         )}
       </main>
 
-      {/* GLOBAL TOAST NOTIFICATION CONTAINER */}
       <AnimatePresence>
         {toast && (
-          <Toast
-            message={toast.msg}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
+          <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />
         )}
       </AnimatePresence>
 
-      {/* ADD DEVICE MODAL */}
       <AnimatePresence>
         {isAddDeviceOpen && (
           <AddDeviceModal
@@ -716,7 +657,6 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* SETTINGS MODAL */}
       <AnimatePresence>
         {isSettingsOpen && (
           <DeviceSettingsModal
