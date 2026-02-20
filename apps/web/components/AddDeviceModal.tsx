@@ -6,7 +6,7 @@ import { Plus, X } from 'lucide-react'
 interface AddDeviceModalProps {
   isOpen: boolean
   onClose: () => void
-  onAdd: (data: { name: string; type: string; id: string }) => void
+  onAdd: (data: { type: string; id: string }) => void
 }
 
 const AddDeviceModal: React.FC<AddDeviceModalProps> = ({
@@ -15,13 +15,12 @@ const AddDeviceModal: React.FC<AddDeviceModalProps> = ({
   onAdd,
 }) => {
   const [formData, setFormData] = useState({
-    name: '',
     type: 'vehicle',
     id: '',
   })
 
   useEffect(() => {
-    if (isOpen) setFormData({ name: '', type: 'vehicle', id: '' })
+    if (isOpen) setFormData({ type: 'vehicle', id: '' })
   }, [isOpen])
 
   if (!isOpen) return null
@@ -48,29 +47,13 @@ const AddDeviceModal: React.FC<AddDeviceModalProps> = ({
 
         <h2 className="text-xl font-bold text-white mb-1">Add New Device</h2>
         <p className="text-xs text-slate-400 mb-6">
-          Register a new unit to the tracking network.
+          Register a new Device to the tracking network.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-              Device Name
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600"
-              placeholder="e.g. Logistics Truck B"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-              Device ID (Optional)
+              Device ID
             </label>
             <input
               type="text"

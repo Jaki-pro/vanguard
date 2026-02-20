@@ -29,6 +29,7 @@ import CustomOSMMap from '../../components/CustomOSMap'
 import DetailView from '../../components/DetailView'
 import AddDeviceModal from '../../components/AddDeviceModal'
 import DeviceSettingsModal from '../../components/DeviceSettingsModal'
+import { useAuth } from '../../hooks/use-auth'
 
 const TILE_SIZE = 256
 const DHAKA_LAT = 23.7937
@@ -264,7 +265,7 @@ export default function App() {
   const [toast, setToast] = useState<ToastMessage | null>(null)
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-
+  const { isAuthenticated, isLoading, user } = useAuth()
   // Responsive Sidebar Initialization
   useEffect(() => {
     const handleResize = () => {
@@ -331,30 +332,49 @@ export default function App() {
     },
     []
   )
-
   // CRUD HANDLERS
-  const handleAddDevice = (data: {
-    name: string
-    type: string
-    id: string
-  }) => {
-    const newId = data.id || `DEV-${Math.floor(Math.random() * 9000) + 1000}`
-    const newDevice: Device = {
-      id: newId,
-      name: data.name,
+  const handleAddDevice = async (data: { type: string; id: string }) => {
+    const API_URL = 'http://localhost:3001/devices/assign'
+
+    // 1. Prepare the payload
+    const newDevice = {
+      deviceId: parseInt(data.id, 10),
+      userId: user?.id,
       type: data.type,
-      status: 'active',
-      lat: DHAKA_LAT + (Math.random() - 0.5) * 0.02,
-      lng: DHAKA_LNG + (Math.random() - 0.5) * 0.02,
-      battery: 100,
-      speed: 0,
-      signal: 5,
-      temp: 30,
-      history: [],
     }
-    setDevices((prev) => [...prev, newDevice])
-    showToast(`Device ${data.name} added successfully!`, 'success')
-    setIsAddDeviceOpen(false)
+    console.log('Adding Device with Data:', newDevice)
+    try {
+      // 2. Execute the API Request
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newDevice),
+      })
+      console.log('API Response:', response)
+      // 3. Check for server-side errors
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || 'Failed to assign device')
+      }
+
+      const savedDevice = await response.json()
+
+      // 4. Update UI State only on success
+      // Use the data returned from the server (savedDevice) if available
+      //setDevices((prev) => [...prev, savedDevice || newDevice]);
+
+      showToast(`Device ${newDevice.deviceId} added successfully!`, 'success')
+      setIsAddDeviceOpen(false)
+    } catch (error: any) {
+      // 5. Handle Failures
+      console.error('Add Device Error:', error)
+      showToast(
+        error.message || 'Network error: Could not add device.',
+        'error'
+      )
+    }
   }
 
   const handleUpdateDevice = (updatedDevice: Device) => {
