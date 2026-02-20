@@ -15,8 +15,11 @@ const app = new OpenAPIHono()
 app.use('/*', cors())
 
 // Start mock devices and broker
-telemetrySimulation('device-001')
-telemetrySimulation('device-002')
+telemetrySimulation('1')
+telemetrySimulation('2')
+telemetrySimulation('3')
+telemetrySimulation('4')
+telemetrySimulation('5')
 brokerSubscribe()
 
 // Mount telemetry routes

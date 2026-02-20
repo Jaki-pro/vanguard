@@ -90,6 +90,9 @@ importers:
       lucide-react:
         specifier: ^0.564.0
         version: 0.564.0(react@19.2.0)
+      mqtt:
+        specifier: ^5.14.1
+        version: 5.14.1
       next:
         specifier: 16.1.0
         version: 16.1.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)

@@ -30,6 +30,7 @@ import DetailView from '../../components/DetailView'
 import AddDeviceModal from '../../components/AddDeviceModal'
 import DeviceSettingsModal from '../../components/DeviceSettingsModal'
 import { useAuth } from '../../hooks/use-auth'
+import { useDeviceTelemetry } from '../../hooks/useDeviceTelemetry'
 
 const TILE_SIZE = 256
 const DHAKA_LAT = 23.7937
@@ -255,7 +256,13 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(
     </div>
   )
 )
-
+  type UserDevice = {
+  id: number;
+  deviceId: number;
+  type: string;
+  userId: string;
+  deviceName: string;
+};
 export default function App() {
   const [devices, setDevices] = useState<Device[]>(generateInitialDevices)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -266,6 +273,7 @@ export default function App() {
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const { isAuthenticated, isLoading, user } = useAuth()
+  const [apiDevices, setApiDevices] = useState<UserDevice[]>([])
   // Responsive Sidebar Initialization
   useEffect(() => {
     const handleResize = () => {
@@ -377,6 +385,31 @@ export default function App() {
     }
   }
 
+  const fetchDevices = useCallback(async () => {
+    if (!user?.id) return
+    const API_BASE = 'http://localhost:3001'
+    try {
+      const res = await fetch(`${API_BASE}/devices/user/${user.id}`)
+      if (!res.ok) throw new Error('Failed to fetch devices')
+
+      const result = await res.json()
+      const rawData: UserDevice[] = result.data || result
+
+      setApiDevices(rawData)
+    } catch (error: any) {
+      console.error('Fetch devices error:', error)
+      showToast(error.message || 'Failed to load your devices', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.id])
+  useEffect(() => {
+    if (user?.id) {
+      fetchDevices()
+    }
+  }, [user?.id, fetchDevices])
+  const telemetryData = useDeviceTelemetry(apiDevices);
+  console.log('Telemetry Data:', telemetryData) // Debugging telemetry data
   const handleUpdateDevice = (updatedDevice: Device) => {
     setDevices((prev) =>
       prev.map((d) => (d.id === updatedDevice.id ? updatedDevice : d))
@@ -388,7 +421,7 @@ export default function App() {
   const handleUpdateStatus = useCallback((id: string, status: string) => {
     setDevices((prev) => prev.map((d) => (d.id === id ? { ...d, status } : d)))
   }, [])
-
+ 
   // Real-time Simulation Loop
   useEffect(() => {
     setTimeout(() => setLoading(false), 800)
