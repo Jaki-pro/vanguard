@@ -1,6 +1,7 @@
-import React, { Activity, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Device, HistoryDataPoint } from '../types'
 import {
+  Activity,
   AlertTriangle,
   Battery,
   Bell,

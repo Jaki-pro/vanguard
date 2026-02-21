@@ -85,7 +85,7 @@ export const createDevice: RouteHandler<typeof createDeviceRoute> = async (
       .values({ deviceName })
       .returning()
 
-    return c.json({ success: true, data: device }, 201)
+    return c.json({ success: true, data: device! }, 201)
   } catch (error) {
     console.error('Error creating device:', error)
     return c.json(
@@ -138,7 +138,7 @@ export const assignDeviceToUser: RouteHandler<
       .returning()
 
     return c.json(
-      { success: true, data: { ...assignment, deviceName: device.deviceName } },
+      { success: true, data: { ...assignment!, deviceName: device!.deviceName } },
       201
     )
   } catch (error: any) {
@@ -225,7 +225,7 @@ export const unassignDeviceFromUser: RouteHandler<
     }
 
     return c.json(
-      { success: true, data: { ...deleted, deviceName: device.deviceName } },
+      { success: true, data: { ...deleted, deviceName: device!.deviceName } },
       200
     )
   } catch (error) {

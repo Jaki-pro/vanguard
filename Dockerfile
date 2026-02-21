@@ -20,8 +20,8 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm run build
 
 # Set environment
-ENV NODE_ENV=production
-NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Expose ports
 EXPOSE 3000 3001
