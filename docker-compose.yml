@@ -1,0 +1,115 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: vanguard_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vanguard_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - vanguard_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vanguard_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: vanguard_influxdb
+    environment:
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: password
+      INFLUXDB_DB: vanguard_telemetry
+      INFLUXDB_BUCKET: vanguard_telemetry
+      INFLUXDB_ADMIN_TOKEN: my-super-secret-token-vanguard-2024
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    networks:
+      - vanguard_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2-alpine
+    container_name: vanguard_mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+    networks:
+      - vanguard_network
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-h", "localhost", "-t", "\\$SYS/#", "-C", "1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vanguard_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/vanguard_db
+      BETTER_AUTH_SECRET: my-secret-key-change-in-production-min-32-chars
+      BETTER_AUTH_URL: http://localhost:3000
+      BROKER_URL: mqtt://mosquitto:1883
+      NEXT_PUBLIC_MQTT_BROKER_URL: ws://localhost:9001/mqtt
+      INFLUX_URL: http://influxdb:8086
+      INFLUX_ORG: GT-Originals
+      INFLUX_BUCKET: vanguard_telemetry
+      INFLUX_TOKEN: my-super-secret-token-vanguard-2024
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./apps:/app/apps
+      - ./packages:/app/packages
+      - /app/node_modules
+    networks:
+      - vanguard_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+networks:
+  vanguard_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  influxdb_data:
+  mosquitto_data:
+  mosquitto_logs:

@@ -288,7 +288,7 @@ const CustomOSMMap: React.FC<CustomOSMMapProps> = ({
             </AnimatePresence>
 
             <div
-              className={`relative ${isSelected ? 'scale-125' : ''} transition-transform`}
+              className={`relative ${isSelected ? 'scale-165' : ''} transition-transform`}
             >
               {device.status === 'active' && (
                 <div

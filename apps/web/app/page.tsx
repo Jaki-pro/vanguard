@@ -123,7 +123,7 @@ const Navbar = () => {
             <Activity className="text-white" size={18} />
           </div>
           <span className="font-bold text-xl tracking-tight text-white">
-            TrackFlow
+            VanGuard
           </span>
         </div>
 
@@ -472,7 +472,7 @@ const Footer = () => (
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Activity className="text-white" size={20} />
             </div>
-            <span className="font-bold text-xl text-white">TrackFlow</span>
+            <span className="font-bold text-xl text-white">VanGuard</span>
           </div>
           <p className="text-slate-400 text-sm leading-relaxed mb-6">
             The operating system for modern logistics. Track, analyze, and
@@ -571,7 +571,7 @@ const Footer = () => (
       </div>
 
       <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-        <p>&copy; 2024 TrackFlow Inc. All rights reserved.</p>
+        <p>&copy; 2024 VanGuard Inc. All rights reserved.</p>
         <div className="flex gap-8">
           <a href="#" className="hover:text-white transition-colors">
             Privacy Policy
@@ -603,7 +603,7 @@ export default function App() {
             Ready to modernize your fleet?
           </h2>
           <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
-            Join thousands of companies using TrackFlow to save costs, improve
+            Join thousands of companies using VanGuard to save costs, improve
             safety, and deliver on time.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">

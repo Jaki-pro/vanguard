@@ -483,7 +483,7 @@ export default function App() {
                 <Activity className="text-white" size={20} />
               </div>
               <span className="font-bold text-lg tracking-tight text-white">
-                TrackFlow
+                VanGuard
               </span>
             </Link>
             <div className="flex items-center gap-1">

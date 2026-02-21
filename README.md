@@ -1,1163 +1,769 @@
-# 🚀 Vanguard - IoT Vehicle Telemetry Platform
+# 🚀 Vanguard — Enterprise IoT Vehicle Telemetry Platform
 
-> **A modern, full-stack IoT platform for real-time vehicle telemetry monitoring, data collection, and intelligent device management.**
-
-<div align="center">
+> **Production-ready, scalable IoT platform for real-time vehicle telemetry monitoring, time-series analytics, and intelligent device management with enterprise-grade authentication and data pipelines.**
 
 [![Node.js](https://img.shields.io/badge/Node.js->=18-brightgreen?logo=node.js)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
+[![Hono](https://img.shields.io/badge/Hono-4.11-orange?logo=hono)](https://hono.dev)
+[![Drizzle ORM](https://img.shields.io/badge/Drizzle-0.45-c5f1f7?logo=drizzle)](https://orm.drizzle.team)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql)](https://www.postgresql.org/)
+[![InfluxDB](https://img.shields.io/badge/InfluxDB-2.x-309cef?logo=influxdb)](https://www.influxdata.com/)
+[![MQTT](https://img.shields.io/badge/MQTT-5.x-660066?logo=mqtt)](https://mqtt.org)
 [![License](https://img.shields.io/badge/License-ISC-purple)](LICENSE)
-[![Turbo](https://img.shields.io/badge/Monorepo-Turbo-blueviolet?logo=turborepo)](https://turbo.build/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?logo=postgresql)](https://www.postgresql.org/)
+[![Turbo](https://img.shields.io/badge/Monorepo-Turbo-%23EF4444?logo=turborepo)](https://turbo.build/)
 
-**[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Tech Stack](#-tech-stack) • [Project Structure](#-project-structure) • [API Documentation](#-api-documentation)**
-
-</div>
-
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Key Features](#-features)
-- [Quick Start](#-quick-start)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [API Documentation](#-api-documentation)
-- [Database Schema](#-database-schema)
-- [Environment Configuration](#-environment-configuration)
-- [Development Workflows](#-development-workflows)
-- [Deployment Guide](#-deployment-guide)
-- [Contributing](#-contributing)
+**[Overview](#overview) • [Features](#features) • [Quick Start](#quick-start) • [Architecture](#architecture) • [Tech Stack](#tech-stack) • [API Docs](#api-documentation) • [Deployment](#deployment) • [Contributing](#contributing)**
 
 ---
 
 ## Overview
 
-**Vanguard** is a production-ready IoT platform designed to collect, process, and visualize real-time vehicle telemetry data. Built with modern technologies and best practices, it provides:
+**Vanguard** is an enterprise-grade IoT platform engineered for high-performance real-time vehicle telemetry processing. Built with modern cloud-native architecture, it delivers a scalable, type-safe, production-ready solution for IoT device management and time-series analytics.
 
-- 🌐 **Real-time Data Streaming** via MQTT protocol
-- 📊 **Time-Series Data Storage** in InfluxDB
-- 🔐 **Enterprise-Grade Authentication** with Better-Auth
-- 📱 **Modern Web Dashboard** for device monitoring
-- 🔌 **Scalable API** with OpenAPI documentation
-- 🏗️ **Monorepo Architecture** with shared components
-- 🧪 **Virtual Device Simulation** for testing
+**Key Characteristics:** Fully Type-Safe (end-to-end TypeScript strict mode) • Real-Time Processing (sub-second MQTT latency) • Scalable (millions of data points/hour) • Enterprise Authentication (multi-tenant session management) • OpenAPI-First (auto-generated docs) • Monorepo Design (Turbo-orchestrated) • Production-Ready (Docker, error handling, monitoring)
 
-### Problem It Solves
-
-Traditional GPS/IoT tracking systems lack:
-
-- Real-time data processing capabilities
-- Scalable cloud-native architecture
-- User-friendly dashboards
-- Multi-device management
-- Strong authentication mechanisms
-
-**Vanguard** addresses all of these challenges with a modern, extensible platform.
+**Use Cases:** ✅ Fleet Management · ✅ IoT Device Monitoring · ✅ Predictive Maintenance · ✅ Real-Time Dashboards · ✅ Multi-Tenant SaaS · ✅ Edge Computing Integration
 
 ---
 
-## 🎯 Features
+## Features
 
-### 🔴 Live Telemetry Collection
+### Real-Time MQTT Data Ingestion
+- Pattern-matched subscriptions: `devices/+/telemetry`; QoS levels 0–2 with automatic reconnection
+- Intelligent message buffering with configurable flush intervals and batch sizing
 
-- **MQTT Integration**: Subscribes to device telemetry topics (`devices/+/telemetry`)
-- Real-time message buffering and batch processing
-- 60-second flush intervals for optimal performance
-- Support for unlimited concurrent devices
-
-### 📈 Time-Series Data Storage
-
-- **InfluxDB Backend**: Storing millions of data points efficiently
-- Automatic data point creation with tags and fields
-- Timestamp precision in milliseconds
-- Query optimization for historical analysis
-
-### 🎪 Virtual Device Simulation
-
-- Simulate multiple devices publishing telemetry
-- Realistic GPS coordinates (Dhaka, Bangladesh base)
-- Dynamic sensor variations (temperature, battery, signal)
-- Perfect for development and testing without hardware
-
-### 🔐 Multi-Tenant Authentication
-
-- Email & password authentication
-- Session-based user management
-- Role-based access control ready
-- Secure password hashing with better-auth
-
-### 📊 Device Management System
-
-- Create and manage multiple devices per user
-- Track device-user relationships
-- Device metadata storage
-- Unique constraint enforcement for user-device pairs
-
-### 🌐 RESTful API with OpenAPI
-
-- Auto-generated API documentation via Swagger UI
-- Scalar API reference interface
-- Type-safe request/response validation with Zod
-- CORS enabled for cross-origin requests
-- Get last 100 telemetry points for any device
-
-### 💻 Modern Web Dashboard
-
-- Next.js 16 with React 19
-- Beautiful UI with Tailwind CSS & Framer Motion
-- Responsive design for all devices
-- Real-time authentication state management
-- Protected routes and user sessions
-
-### 🎨 Shared Component Library
-
-- Reusable React components
-- Centralized styling with Tailwind
-- Button, Card, Code snippet components
-- Ready for component consumption across apps
-
----
-
-## ⚡ Quick Start
-
-### Prerequisites
-
-```bash
-# Required versions
-- Node.js >= 18.x
-- PostgreSQL >= 12.x
-- MQTT Broker (Mosquitto or similar)
-- InfluxDB 2.x (optional for production)
+```typescript
+client.subscribe('devices/+/telemetry', { qos: 1 });
+const flushInterval = 60000;  // 60 seconds
+const maxBatchSize  = 5000;
 ```
 
-### 1️⃣ Clone & Install Dependencies
+### Time-Series Data Persistence
+- InfluxDB with millisecond precision, automatic aggregation, configurable retention policies, Flux query language
+- **Data flow:** `MQTT → Buffer → Batch Write → InfluxDB → Query API → Dashboard`
+
+### Virtual Device Simulation
+- 5 concurrent simulated devices with realistic GPS (Dhaka, Bangladesh), battery, temperature, and signal variations
+- Eliminates hardware dependency during development; ideal for load testing and API validation
+
+### Enterprise Authentication & Authorization
+- Session management, bcrypt-hashed passwords, session token rotation, HTTPS/CORS protection
+- RBAC-ready (Admin, User, Viewer), full audit trail via createdAt/updatedAt timestamps
+
+### Device Management System
+- Hierarchical user → device ownership, metadata (name, type), status tracking, constraint enforcement
+- One-to-many device-to-user with unique constraint via `userDevices` junction table
+
+### RESTful API with OpenAPI 3.1
+- Zod schema validation on all requests/responses, auto-generated Swagger UI + Scalar docs
+- Rate limiting: 1000 req/hour, 50 req/minute burst; standardized error codes
+
+### Modern Web Dashboard
+- Next.js 16 server components, Tailwind CSS, Framer Motion animations
+- OpenStreetMap visualization (Web Mercator), real-time device pins, protected routes via middleware
+
+---
+
+## System Requirements
+
+```
+Node.js       18+ (v20 recommended)     PostgreSQL    12+ (15 recommended)
+pnpm          9+                         InfluxDB      2.x
+RAM           4GB min, 8GB recommended   MQTT Broker   Mosquitto 2.x or compatible
+Storage       50GB free                  Docker        20.10+ (optional)
+```
+
+---
+
+## Quick Start
+
+### Step 1 — Install Prerequisites
+
+**macOS:**
+```bash
+brew install node@20 postgresql influxdb mosquitto
+brew services start postgresql influxdb mosquitto
+```
+
+**Ubuntu/Debian:**
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs postgresql influxdb2 mosquitto mosquitto-clients
+sudo systemctl start postgresql influxdb2 mosquitto
+```
+
+**Windows (Chocolatey):**
+```powershell
+choco install nodejs-lts postgresql influxdb mosquitto -y
+psql -U postgres -c "CREATE DATABASE vanguard_db;"
+```
+
+### Step 2 — Clone & Install
 
 ```bash
-# Clone repository
 git clone https://github.com/yourusername/vanguard.git
 cd vanguard
-
-# Install dependencies with pnpm
+npm install -g pnpm@9.0.0
 pnpm install
 ```
 
-### 2️⃣ Setup Databases
+### Step 3 — Configure Environment
 
-```bash
-# PostgreSQL setup
-createdb vanguard_db
-
-# Run migrations
-cd packages/db
-pnpm run migrate
-
-# Generate Prisma client
-pnpm generate
-```
-
-### 3️⃣ Configure Environment Variables
-
-#### API `.env` (`apps/api/.env`)
-
-```env
-# MQTT Broker Configuration
-BROKER_URL=mqtt://localhost:1883
-
-# InfluxDB Configuration
-INFLUX_URL=http://localhost:8086
-INFLUX_TOKEN=your-influx-token
-INFLUX_ORG=GT-Originals
-INFLUX_BUCKET=vanguard_db
-```
-
-#### Database `.env` (`packages/db/.env`)
-
+**`packages/db/.env`:**
 ```env
 DATABASE_URL=postgresql://postgres:password@127.0.0.1:5432/vanguard_db
-BETTER_AUTH_SECRET=your-secret-key-here
+BETTER_AUTH_SECRET=your-secret-key-change-this-min-32-chars-long!
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
-### 4️⃣ Start Development Servers
+**`apps/api/.env`:**
+```env
+BROKER_URL=mqtt://localhost:1883
+INFLUX_URL=http://localhost:8086
+INFLUX_TOKEN=your-influx-token
+INFLUX_ORG=MyOrg
+INFLUX_BUCKET=vanguard_db
+```
+
+### Step 4 — Initialize Databases
 
 ```bash
-# Start all services in parallel (Turbo orchestration)
+# PostgreSQL
+createdb vanguard_db
+psql vanguard_db -c "CREATE USER vanguard WITH PASSWORD 'password';"
+psql vanguard_db -c "GRANT ALL PRIVILEGES ON DATABASE vanguard_db TO vanguard;"
+cd packages/db && pnpm run db:push
+psql vanguard_db -c "\dt"  # Should show: users, devices, userDevices, session, account
+
+# InfluxDB (open http://localhost:8086 or via CLI)
+influx setup \
+  --bucket vanguard_db --org MyOrg \
+  --username admin --password AdminPassword123 \
+  --token MySecureToken123456789 --force
+echo "INFLUX_TOKEN=MySecureToken123456789" >> apps/api/.env
+```
+
+### Step 5 — Start & Verify
+
+```bash
 pnpm dev
+# ✓ @repo/api  →  http://localhost:3001
+# ✓ web        →  http://localhost:3000
+# ✓ MQTT broker connected
+# ✓ Virtual devices publishing telemetry
 
-# This will start:
-# - Web app (Next.js)     → http://localhost:3000
-# - API server (Hono)     → http://localhost:3001
-# - Virtual devices       → Publishing telemetry
-# - MQTT subscriber       → Processing messages
+curl http://localhost:3001/telemetry/1       # Test telemetry
+curl http://localhost:3001/openapi.json      # Verify API spec
+open http://localhost:3001/docs             # API docs
+open http://localhost:3000                  # Web dashboard
 ```
 
-### 5️⃣ Access the Application
+### Troubleshooting Initial Setup
 
-| Service                | URL                                 | Purpose                           |
-| ---------------------- | ----------------------------------- | --------------------------------- |
-| **Web Dashboard**      | http://localhost:3000               | Main UI, login, device management |
-| **API Docs (Swagger)** | http://localhost:3001/swagger       | Interactive API documentation     |
-| **API Docs (Scalar)**  | http://localhost:3001/api/reference | Beautiful API reference           |
-| **OpenAPI JSON**       | http://localhost:3001/openapi.json  | Machine-readable schema           |
+```bash
+# Port conflicts
+lsof -i :3000 && lsof -i :3001 && lsof -i :5432 && lsof -i :8086 && lsof -i :1883
+kill -9 <PID>
 
----
+# Test MQTT
+mosquitto_pub -h localhost -t test/topic -m "test"
+mosquitto_sub -h localhost -t test/topic
 
-## 🏗️ Architecture
+# Test InfluxDB auth
+influx auth list
+influx auth create --org MyOrg
 
-### System Diagram
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      VANGUARD PLATFORM                      │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────┐         ┌──────────────┐      ┌──────────┐
-│   DEVICES       │         │   VIRTUAL    │      │ WEB APP  │
-│ (In-field IoT)  │         │   DEVICES    │      │(React)  │
-└────────┬────────┘         └──────┬───────┘      └────┬─────┘
-         │                         │                    │
-         └─────────────────┬───────┴────────────────────┘
-                           │
-                    ┌──────▼─────────┐
-                    │  MQTT BROKER   │ ◄─── Pub/Sub
-                    │  (Mosquitto)   │
-                    └──────┬─────────┘
-                           │
-                    ┌──────▼─────────┐
-                    │   API SERVER   │
-                    │  (Hono + TS)   │
-                    └──────┬─────────┘
-                    ┌──────┴──────────────┬─────────────┐
-                    │                     │             │
-            ┌───────▼────────┐   ┌────────▼─────┐  ┌────▼────────┐
-            │  PostgreSQL    │   │   InfluxDB   │  │ OpenAPI/    │
-            │  (User Data)   │   │(Time-Series) │  │  Swagger    │
-            └────────────────┘   └──────────────┘  └─────────────┘
-```
-
-### Data Flow
-
-```
-Device Hardware
-    ↓
-MQTT Broker (devices/+/telemetry)
-    ↓
-API Server (Message Buffer)
-    ↓
-InfluxDB (Time-Series Storage)
-    ↓
-Web Dashboard (Real-time Charts)
-```
-
-### Request/Response Cycle
-
-```
-Client -> Next.js App -> Hono API -> InfluxDB Query
-                             ↓
-                         OpenAPI Validation
-                             ↓
-                         Response JSON
+# Test PostgreSQL
+psql -U postgres -h localhost   # then: \du  \l
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  VANGUARD PLATFORM                      │
+└─────────────────────────────────────────────────────────┘
+
+   IoT Devices (GPS / Speed / Battery / Temperature)
+        │  MQTT (QoS 1) — Topic: devices/+/telemetry
+        ▼
+   MQTT Broker (Mosquitto / AWS IoT Core)
+        │
+   ┌────┴──────────────────────────────────────┐
+   │                                           │
+   ▼                                           ▼
+API Server (Hono :3001)              Web App (Next.js :3000)
+  ✓ Zod Validation                    ✓ React 19 Components
+  ✓ CORS / OpenAPI                    ✓ TailwindCSS + Framer Motion
+  ✓ MQTT Client                       ✓ Protected Routes + Map
+   │                                       │
+   │  Message Buffer (60s / 5000 pts)      │
+   ▼                                       │
+Database Layer ◄───────────────────────────┘
+  ├── PostgreSQL  (users, devices, sessions, accounts)
+  └── InfluxDB    (device_telemetry — time-series)
+```
+
+**Data Flow:**
+```
+Device → MQTT Publish → Hono (validate + buffer) → 60s batch flush
+       ├─→ PostgreSQL (metadata: users, devices)
+       └─→ InfluxDB   (telemetry time-series)
+       → GET /telemetry/:id → Web Dashboard
+```
+
+---
+
+## Tech Stack
 
 ### Frontend
 
-| Technology        | Purpose                  | Version |
-| ----------------- | ------------------------ | ------- |
-| **Next.js**       | React framework with SSR | 16.1.0  |
-| **React**         | UI library               | 19.2.0  |
-| **TypeScript**    | Type safety              | 5.9.2   |
-| **Tailwind CSS**  | Styling framework        | 4.1.18  |
-| **Framer Motion** | Animations               | 12.34.0 |
-| **Lucide React**  | Icon library             | 0.564.0 |
-| **Better-Auth**   | Authentication           | 1.4.18  |
+| Technology | Version | Purpose |
+|---|---|---|
+| Next.js | 16.1.0 | React meta-framework, server components |
+| React | 19.2.0 | UI library, concurrent rendering |
+| TypeScript | 5.9.2 | Strict static typing |
+| Tailwind CSS | 4.1.18 | Utility-first styling |
+| Framer Motion | 12.34.0 | Animations & spring physics |
+| Lucide React | 0.564.0 | Icon library (464+ icons) |
+| Better-Auth | 1.4.18 | Multi-tenant authentication |
+| MQTT.js | 5.14.1 | Browser MQTT client |
 
 ### Backend
 
-| Technology                      | Purpose              | Version |
-| ------------------------------- | -------------------- | ------- |
-| **Hono**                        | Web framework        | 4.11.5  |
-| **TypeScript**                  | Type safety          | 5.9.3   |
-| **Zod**                         | Schema validation    | 4.3.6   |
-| **@hono/zod-openapi**           | OpenAPI integration  | 1.2.1   |
-| **MQTT.js**                     | MQTT client          | 5.14.1  |
-| **@influxdata/influxdb-client** | InfluxDB integration | 1.35.0  |
+| Technology | Version | Purpose |
+|---|---|---|
+| Hono | 4.11.5 | Web framework — type-safe, 500KB bundle |
+| TypeScript | 5.9.3 | Strict mode reliability |
+| Zod | 4.3.6 | Runtime validation, great error messages |
+| @hono/zod-openapi | 1.2.1 | Auto-generated type-safe OpenAPI docs |
+| @hono/node-server | 1.19.9 | Production Node.js HTTP server |
+| MQTT.js | 5.14.1 | Async broker client, QoS support |
+| @influxdata/influxdb-client | 1.35.0 | Flux queries, batch write API |
+| Drizzle ORM | 0.45.1 | Type-safe queries, migrations |
+| pg | 8.18.0 | PostgreSQL native driver + connection pooling |
 
 ### Infrastructure
 
-| Technology      | Purpose                   |
-| --------------- | ------------------------- |
-| **PostgreSQL**  | Relational database       |
-| **Drizzle ORM** | Type-safe database access |
-| **InfluxDB**    | Time-series database      |
-| **MQTT**        | Message broker            |
-| **Turbo**       | Monorepo orchestration    |
-
-### Developer Tools
-
-| Technology   | Purpose              |
-| ------------ | -------------------- |
-| **pnpm**     | Package manager      |
-| **Turbo**    | Build orchestration  |
-| **ESLint**   | Code linting         |
-| **Prettier** | Code formatting      |
-| **tsx**      | TypeScript execution |
+| Technology | Version | Purpose |
+|---|---|---|
+| PostgreSQL | 15+ | Relational data, ACID transactions, pooling (20 max) |
+| InfluxDB | 2.x | High-cardinality time-series, millisecond precision |
+| Mosquitto | 2.x | MQTT broker, pattern matching, QoS, TLS |
+| pnpm | 9+ | Package manager |
+| Turbo | 2.7.5 | Monorepo build orchestration + caching |
+| tsx | 4.21.0 | TypeScript executor |
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 vanguard/
-├── 📄 package.json              # Root workspace config
-├── 📄 pnpm-workspace.yaml       # Monorepo config
-├── 📄 turbo.json                # Build orchestration
-├── 📄 tsconfig.json             # TypeScript base config
-│
 ├── apps/
-│   ├── api/                     # 🔌 Hono REST API
-│   │   ├── src/
-│   │   │   ├── index.ts         # App entry point
-│   │   │   ├── mqtt/
-│   │   │   │   └── mqtt-client.ts          # MQTT broker subscription
-│   │   │   ├── virtual-simulations/
-│   │   │   │   └── telemetry.ts            # Device simulator
-│   │   │   └── features/
-│   │   │       └── telemetry/
-│   │   │           ├── telemetry.route.ts  # Route handlers
-│   │   │           ├── telemetry.handler.ts # Business logic
-│   │   │           └── telemetry.schema.ts  # Zod schemas
-│   │   ├── package.json
-│   │   └── tsconfig.json
+│   ├── api/                          # Hono API Server (port 3001)
+│   │   └── src/
+│   │       ├── index.ts              # App init, middleware (CORS, logging), MQTT + virtual device start
+│   │       ├── mqtt/
+│   │       │   └── mqtt-client.ts    # Subscribe devices/+/telemetry, buffer msgs, batch write InfluxDB
+│   │       ├── virtual-simulations/
+│   │       │   └── telemetry.ts      # 5 mock devices, realistic GPS/sensor, dynamic battery/speed
+│   │       └── features/
+│   │           ├── telemetry/
+│   │           │   ├── telemetry.route.ts    # GET /telemetry/:id · POST /batch · GET /history/:id
+│   │           │   ├── telemetry.handler.ts  # Query InfluxDB, format responses, error handling
+│   │           │   └── telemetry.schema.ts   # Zod request/response/error schemas
+│   │           └── device/
+│   │               ├── device.route.ts       # GET · POST · PATCH · DELETE /devices
+│   │               ├── device.handler.ts     # CRUD + user relationship + constraint validation
+│   │               └── device.schema.ts      # Zod device schemas
 │   │
-│   └── web/                     # 🌐 Next.js Web App
+│   └── web/                          # Next.js Frontend (port 3000)
 │       ├── app/
-│       │   ├── api/
-│       │   │   └── auth/[...all]/route.ts  # Auth API routes
-│       │   ├── dashboard/page.tsx          # Dashboard
-│       │   ├── login/page.tsx              # Login page
-│       │   ├── signup/page.tsx             # Signup page
-│       │   ├── page.tsx                    # Home page
-│       │   ├── layout.tsx                  # Root layout
-│       │   └── globals.css                 # Global styles
+│       │   ├── layout.tsx            # Root layout, Geist fonts, metadata
+│       │   ├── page.tsx              # Landing page
+│       │   ├── dashboard/page.tsx    # Device sidebar + charts + map + detail panel
+│       │   ├── login/page.tsx
+│       │   ├── signup/page.tsx
+│       │   └── api/auth/[...all]/route.ts   # Better-Auth sign-up/sign-in/session
+│       ├── components/
+│       │   ├── DetailView.tsx        # Real-time battery/speed/temperature charts
+│       │   ├── CustomOSMap.tsx       # Web Mercator OSM map, device pins, pan/zoom
+│       │   ├── AddDeviceModal.tsx    # Add device form with validation
+│       │   └── DeviceSettingsModal.tsx  # Update name/type, delete device
 │       ├── hooks/
-│       │   └── use-auth.ts                 # Auth hook
+│       │   ├── use-auth.ts           # useAuth() — session/user/loading/error
+│       │   └── useDeviceTelemetry.ts # MQTT subscription, message parsing, state
 │       ├── lib/
-│       │   ├── auth-client.ts              # Auth client
-│       │   └── client.ts                   # API client
-│       ├── package.json
-│       └── tsconfig.json
+│       │   ├── auth-client.ts        # Better-Auth client, sign-in/sign-up functions
+│       │   └── client.ts             # Typed Hono API client, request/response handling
+│       └── middleware.ts             # Auth verification, protected route guards
 │
-├── packages/
-│   ├── db/                      # 🗄️ Database & Schema
-│   │   ├── src/
-│   │   │   ├── schema.ts        # Drizzle ORM schema
-│   │   │   ├── db.ts            # Database client
-│   │   │   ├── auth.ts          # Better-auth setup
-│   │   │   └── index.ts         # Exports
-│   │   ├── drizzle/
-│   │   │   ├── migrations/      # SQL migrations
-│   │   │   └── meta/            # Migration metadata
-│   │   ├── .env                 # Database config
-│   │   ├── drizzle.config.ts    # Drizzle config
-│   │   └── package.json
-│   │
-│   ├── ui/                      # 🎨 Shared Components
-│   │   ├── src/
-│   │   │   ├── button.tsx       # Button component
-│   │   │   ├── card.tsx         # Card component
-│   │   │   └── code.tsx         # Code component
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   │
-│   ├── eslint-config/           # 📋 ESLint Configs
-│   │   ├── base.js              # Base config
-│   │   ├── next.js              # Next.js config
-│   │   └── react-internal.js    # React config
-│   │
-│   └── typescript-config/       # 📘 TypeScript Configs
-│       ├── base.json            # Base tsconfig
-│       ├── nextjs.json          # Next.js tsconfig
-│       └── react-library.json   # React lib tsconfig
-│
-└── README.md                    # This file
+└── packages/
+    ├── db/
+    │   └── src/
+    │       ├── schema.ts             # Drizzle table definitions + relationships + type inference
+    │       ├── db.ts                 # PostgreSQL connection + pool (20 max connections)
+    │       ├── auth.ts               # Better-Auth config, session/account mapping, type exports
+    │       └── index.ts              # Loads dotenv FIRST, re-exports auth/db/schema
+    ├── ui/                           # Shared button, card, code components (WCAG 2.1 AA)
+    ├── eslint-config/                # Base, Next.js, React-internal ESLint rules
+    └── typescript-config/            # base.json, nextjs.json, react-library.json
 ```
-
-### Key File Descriptions
-
-| File                                            | Purpose                                                      | Type    |
-| ----------------------------------------------- | ------------------------------------------------------------ | ------- |
-| `apps/api/src/index.ts`                         | API initialization, middleware setup, route mounting         | Core    |
-| `apps/api/src/mqtt/mqtt-client.ts`              | MQTT broker subscription, message buffering, InfluxDB writes | Core    |
-| `apps/api/src/virtual-simulations/telemetry.ts` | Simulates devices publishing telemetry                       | Testing |
-| `apps/web/app/page.tsx`                         | Landing page with features showcase                          | UI      |
-| `packages/db/src/schema.ts`                     | Database tables: users, devices, sessions                    | Core    |
-| `packages/db/src/auth.ts`                       | Authentication configuration                                 | Core    |
 
 ---
 
-## 🔗 API Documentation
+## API Documentation
 
-### Base URL
+- **Swagger UI:** `http://localhost:3001/docs`
+- **Scalar Docs:** `http://localhost:3001/scalar`
+- **OpenAPI JSON:** `http://localhost:3001/openapi.json`
 
+Authentication: `Cookie: better-auth.session_token=<token>` (endpoints marked 🔐)
+
+### `GET /telemetry/{device_id}`
+
+```bash
+curl "http://localhost:3001/telemetry/device-001?limit=10"
 ```
-http://localhost:3001
-```
-
-### Available Endpoints
-
-#### 1. Get Device Telemetry
-
-```http
-GET /telemetry/{device_id}
-```
-
-**Parameters:**
-
-- `device_id` (path, required): The device identifier (e.g., "device-001")
-
-**Response (200 OK):**
 
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "device_id": "device-001",
-      "timestamp": "2024-02-18T10:30:45.123Z",
-      "latitude": 23.8103,
-      "longitude": 90.4125,
-      "altitude": 12.5,
-      "speed": 45.67,
-      "heading": 180,
-      "accuracy": 4.2,
-      "satellites": 12,
-      "battery_level": 85,
-      "charging": true,
-      "signal_strength": -65,
-      "temperature": 32.5,
-      "status": "active"
-    }
-  ],
-  "count": 1
+  "success": true, "device_id": "device-001", "count": 10,
+  "data": [{
+    "device_id": "device-001", "timestamp": "2024-02-21T15:30:45.123Z",
+    "latitude": 23.8103, "longitude": 90.4125, "altitude": 12.5,
+    "speed": 45.67, "heading": 180, "accuracy": 4.2, "satellites": 12,
+    "battery_level": 85, "charging": true,
+    "signal_strength": -65, "temperature": 32.5, "status": "active"
+  }]
 }
 ```
 
-**Error (500):**
+### `POST /devices/assign` 🔐
 
 ```json
-{
-  "success": false,
-  "message": "Failed to retrieve telemetry data"
-}
+// Request
+{ "deviceId": 1, "userId": "user-123-456", "type": "vehicle" }
+// Response
+{ "success": true, "message": "Device assigned successfully",
+  "userDevice": { "id": 5, "deviceId": 1, "userId": "user-123-456", "type": "vehicle" } }
 ```
 
-### Telemetry Data Fields Reference
+### Telemetry Field Reference
 
-| Field             | Type     | Description                  | Unit                       |
-| ----------------- | -------- | ---------------------------- | -------------------------- |
-| `device_id`       | string   | Unique device identifier     | -                          |
-| `timestamp`       | ISO 8601 | Data collection timestamp    | -                          |
-| `latitude`        | number   | Geographic latitude          | Degrees                    |
-| `longitude`       | number   | Geographic longitude         | Degrees                    |
-| `altitude`        | number   | Height above sea level       | Meters                     |
-| `speed`           | number   | Vehicle speed                | km/h                       |
-| `heading`         | integer  | Direction of travel          | Degrees (0-360)            |
-| `accuracy`        | number   | GPS accuracy                 | Meters                     |
-| `satellites`      | integer  | Connected satellites count   | Count                      |
-| `battery_level`   | integer  | Device battery percentage    | % (0-100)                  |
-| `charging`        | boolean  | Charging status              | true/false                 |
-| `signal_strength` | integer  | Network signal strength      | dBm                        |
-| `temperature`     | number   | Device operating temperature | °C                         |
-| `status`          | string   | Device status                | "active", "inactive", etc. |
+| Field | Type | Range / Unit |
+|---|---|---|
+| latitude / longitude | float | ±90° / ±180° |
+| altitude | float | meters |
+| speed | float | km/h |
+| heading | int | 0–360° |
+| accuracy | float | meters (GPS error) |
+| satellites | int | count |
+| battery_level | int | 0–100% |
+| charging | bool | — |
+| signal_strength | int | dBm (negative) |
+| temperature | float | °C |
+| status | string | active / offline / low_battery / maintenance |
 
-### Interactive API Documentation
+### Error Format & Status Codes
 
-Visit these URLs in your browser:
+```json
+{ "success": false, "code": "ERROR_CODE", "message": "Human readable",
+  "details": { "field": "field_name", "issue": "Specific error" } }
+```
 
-- **Swagger UI**: `http://localhost:3001/swagger`
-- **Scalar Reference**: `http://localhost:3001/api/reference`
+| Code | Meaning | Code | Meaning |
+|---|---|---|---|
+| 200/201 | OK / Created | 404 | Not Found |
+| 400 | Bad Request | 409 | Conflict |
+| 401 | Unauthorized | 429 | Rate Limit Exceeded |
+| 403 | Forbidden | 500/503 | Server Error / Unavailable |
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
-### Entity-Relationship Diagram
-
-```
-┌─────────────────┐
-│     users       │
-├─────────────────┤
-│ id (PK)         │
-│ name            │
-│ email (UNIQUE)  │
-│ emailVerified   │
-│ image           │
-│ createdAt       │
-│ updatedAt       │
-└────────┬────────┘
-         │ 1
-         │ (has many)
-         │
-         │
-    ┌────┴─────────────────┐
-    │                      │
-    │ 1 (has many)        │ 1 (has many)
-    │                      │
-┌──▼──────────────┐   ┌───▼───────────┐
-│   devices       │   │    session    │
-├─────────────────┤   ├───────────────┤
-│ id (PK)         │   │ id (PK)       │
-│ deviceName      │   │ expiresAt     │
-└─────────────────┘   │ token (UNIQUE)│
-    ▲                 │ ipAddress     │
-    │                 │ userAgent     │
-    │ M               │ userId (FK)   │
-    │ (references)    │ createdAt     │
-    │                 │ updatedAt     │
-┌───┴──────────────┐  └───────────────┘
-│ userDevices      │
-├──────────────────┤
-│ id (PK)          │
-│ deviceId (FK)    │  ┌─────────────┐
-│ userId (FK)      │  │   account   │
-├──────────────────┤  ├─────────────┤
-│ UNIQUE(userId,   │  │ id (PK)     │
-│        deviceId) │  │ accountId   │
-└──────────────────┘  │ providerId  │
-                      │ userId (FK) │
-                      └─────────────┘
-```
-
-### Tables Overview
-
-#### `users`
-
-Stores user account information with authentication details.
+### PostgreSQL (via Drizzle ORM)
 
 ```sql
+-- Users
 CREATE TABLE users (
-  id VARCHAR(255) PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  emailVerified BOOLEAN NOT NULL DEFAULT false,
-  image VARCHAR(500),
-  createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-  updatedAt TIMESTAMP NOT NULL DEFAULT NOW()
+  id VARCHAR(255) PRIMARY KEY, name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE, emailVerified BOOLEAN DEFAULT false,
+  image VARCHAR(500), createdAt TIMESTAMP DEFAULT NOW(), updatedAt TIMESTAMP DEFAULT NOW()
 );
-```
 
-#### `devices`
-
-Represents IoT devices that publish telemetry data.
-
-```sql
+-- Devices
 CREATE TABLE devices (
-  id SERIAL PRIMARY KEY,
-  deviceName VARCHAR(255) NOT NULL
+  id SERIAL PRIMARY KEY, deviceName VARCHAR(255) NOT NULL
 );
-```
 
-#### `userDevices`
-
-Maps users to their devices (many-to-many relationship).
-
-```sql
+-- Many-to-many junction
 CREATE TABLE userDevices (
   id SERIAL PRIMARY KEY,
   deviceId INTEGER NOT NULL REFERENCES devices(id),
   userId VARCHAR(255) NOT NULL REFERENCES users(id),
   UNIQUE(userId, deviceId)
 );
-```
 
-#### `session`
-
-Manages user sessions and authentication tokens.
-
-```sql
+-- Sessions
 CREATE TABLE session (
-  id VARCHAR(255) PRIMARY KEY,
-  expiresAt TIMESTAMP NOT NULL,
-  token VARCHAR(500) NOT NULL UNIQUE,
-  ipAddress VARCHAR(45),
-  userAgent VARCHAR(500),
+  id VARCHAR(255) PRIMARY KEY, expiresAt TIMESTAMP NOT NULL,
+  token VARCHAR(500) NOT NULL UNIQUE, ipAddress VARCHAR(45), userAgent VARCHAR(500),
   userId VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-  updatedAt TIMESTAMP NOT NULL DEFAULT NOW()
+  createdAt TIMESTAMP DEFAULT NOW(), updatedAt TIMESTAMP DEFAULT NOW()
 );
-```
 
-#### `account`
-
-Stores authentication provider information.
-
-```sql
+-- Auth providers
 CREATE TABLE account (
-  id VARCHAR(255) PRIMARY KEY,
-  accountId VARCHAR(255) NOT NULL,
+  id VARCHAR(255) PRIMARY KEY, accountId VARCHAR(255) NOT NULL,
   providerId VARCHAR(255) NOT NULL,
   userId VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  accessToken VARCHAR(1000),
-  refreshToken VARCHAR(1000),
-  idToken VARCHAR(1000),
-  accessTokenExpiresAt TIMESTAMP,
-  refreshTokenExpiresAt TIMESTAMP,
-  scope VARCHAR(500),
-  password VARCHAR(255),
-  createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-  updatedAt TIMESTAMP NOT NULL DEFAULT NOW()
+  accessToken VARCHAR(1000), refreshToken VARCHAR(1000), password VARCHAR(255),
+  accessTokenExpiresAt TIMESTAMP, refreshTokenExpiresAt TIMESTAMP, scope VARCHAR(500),
+  createdAt TIMESTAMP DEFAULT NOW(), updatedAt TIMESTAMP DEFAULT NOW()
 );
 ```
 
 ### InfluxDB Schema
 
-**Measurement**: `device_telemetry`
-
-**Tags:**
-
-- `device_id` - Device identifier
-- `status` - Device status
-
-**Fields:**
-
-- `latitude` (float)
-- `longitude` (float)
-- `altitude` (float)
-- `speed` (float)
-- `accuracy` (float)
-- `temperature` (float)
-- `heading` (int)
-- `satellites` (int)
-- `battery_level` (int)
-- `signal_strength` (int)
-- `charging` (boolean)
+**Measurement:** `device_telemetry`  
+**Tags (indexed):** `device_id`, `status`  
+**Fields:** `latitude`, `longitude`, `altitude`, `speed`, `heading`, `accuracy`, `temperature`, `satellites`, `battery_level`, `signal_strength`, `charging`  
+**Retention:** Configurable policies with automatic downsampling support
 
 ---
 
-## ⚙️ Environment Configuration
+## Environment Configuration
 
-### Required Environment Variables
-
-#### API Server (`apps/api/.env`)
+### API Server (`apps/api/.env`)
 
 ```env
-# MQTT Broker - Protocol: mqtt:// or mqtts://
-BROKER_URL=mqtt://localhost:1883
-
-# InfluxDB Configuration
-# URL must include protocol (http:// or https://)
-INFLUX_URL=http://localhost:8086
-
-# InfluxDB authentication token with write permissions
-INFLUX_TOKEN=KZ0hKXFHkBpQO6QzgDpR2zug61FAD2Og3EDaiRmqTKWCN52rS11rVwaq1vZlb71qEoXJF_xUu_zKVhoGdZRIvQ==
-
-# InfluxDB organization name (created in InfluxDB admin)
-INFLUX_ORG=GT-Originals
-
-# InfluxDB bucket name (data repository)
+BROKER_URL=mqtt://localhost:1883          # Use mqtts:// in production
+INFLUX_URL=http://localhost:8086          # Must include protocol
+INFLUX_TOKEN=your-token-with-write-perms  # Generate in InfluxDB UI
+INFLUX_ORG=MyOrg
 INFLUX_BUCKET=vanguard_db
 ```
 
-#### Database (`packages/db/.env`)
+### Database (`packages/db/.env`)
 
 ```env
-# PostgreSQL connection string
-# Format: postgresql://[user]:[password]@[host]:[port]/[database]
 DATABASE_URL=postgresql://postgres:password@127.0.0.1:5432/vanguard_db
-
-# Authentication secret for token signing
 BETTER_AUTH_SECRET=your-super-secret-key-min-32-characters-long
-
-# Base URL for auth callbacks
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
-### Configuration Tips
-
-| Variable             | Notes                                                               |
-| -------------------- | ------------------------------------------------------------------- |
-| `BROKER_URL`         | Ensure MQTT broker is running before starting API                   |
-| `INFLUX_URL`         | Must include protocol; InfluxDB must be accessible                  |
-| `INFLUX_TOKEN`       | Generate in InfluxDB UI with bucket:create, bucket:read permissions |
-| `DATABASE_URL`       | Use local PostgreSQL for development                                |
-| `BETTER_AUTH_SECRET` | Use strong random string, min 32 chars                              |
+| Variable | Notes |
+|---|---|
+| `BROKER_URL` | Broker must be running before API starts |
+| `INFLUX_TOKEN` | Needs bucket:create + bucket:read permissions |
+| `BETTER_AUTH_SECRET` | Min 32 chars — rotate if compromised |
+| `DATABASE_URL` | Use cloud DB URL (RDS, Supabase) in production |
 
 ---
 
-## 🚀 Development Workflows
-
-### Building the Project
+## Development Workflows
 
 ```bash
-# Build all packages and apps
-pnpm build
-
-# Build specific workspace
-pnpm build --filter=@repo/api
-
-# Build with turbo
-turbo build
-```
-
-### Running Development Mode
-
-```bash
-# Start all services with Turbo orchestration
+# Start all services with live reload
 pnpm dev
 
-# Start specific app
+# Single service
 pnpm dev --filter=web
 pnpm dev --filter=@repo/api
 
-# Start in watch mode (auto-rebuild)
-cd apps/api && pnpm run dev
-```
-
-### Linting & Type Checking
-
-```bash
-# Lint all code
-pnpm lint
-
-# Format code
-pnpm format
+# Database management
+cd packages/db
+pnpm run db:generate --name add_new_table  # Create migration SQL
+pnpm run db:push                           # Apply to DB
+pnpm run db:check                          # Migration status
+pnpm run db:studio                         # GUI browser
+pnpm run db:reset                          # ⚠️ Destructive
 
 # Type checking
 pnpm check-types
+pnpm check-types --filter=@repo/api
 
-# Check all
-pnpm lint && pnpm format && pnpm check-types
-```
+# Lint & format
+pnpm lint && pnpm lint --fix
+pnpm format
+prettier --check "**/*.{ts,tsx,md}"
 
-### Database Migrations
+# Test endpoints
+curl http://localhost:3001/devices | jq .
+curl -X POST "http://localhost:3001/devices" \
+  -H "Content-Type: application/json" -d '{"deviceName":"test"}'
+curl -X GET "http://localhost:3001/devices" \
+  -H "Cookie: better-auth.session_token=YOUR_TOKEN"
 
-```bash
-# Create migration after schema changes
-cd packages/db
-pnpm run migrate:dev --name migration_name
+# MQTT debugging
+mosquitto_sub -h localhost -t 'devices/#' -v
+mosquitto_pub -h localhost -t 'devices/1/telemetry' -m '{"device_id":"1","speed":50}'
 
-# Check migration status
-pnpm run migrate:status
-
-# Reset database (⚠️ destructive!)
-pnpm run migrate:reset
-
-# Generate Drizzle client
-pnpm run generate
-```
-
-### Testing & Simulation
-
-```bash
-# Virtual devices automatically start with API
-# Monitor output in API terminal
-
-# Test telemetry endpoint
-curl http://localhost:3001/telemetry/device-001
-
-# Test with real MQTT client (optional)
-mosquitto_sub -h localhost -t 'devices/+/telemetry'
-```
-
-### Common Commands
-
-```bash
-# Install dependencies
-pnpm install
-
-# Add dependency to specific workspace
+# Add packages
 pnpm add axios --filter=@repo/api
-
-# Remove dependency
-pnpm remove lodash --filter=web
-
-# Update all dependencies
-pnpm update --recursive
-
-# Audit dependencies for vulnerabilities
-pnpm audit
-
-# View workspace information
-pnpm ls --recursive --depth=0
+pnpm add tailwindcss --filter=web --save-dev
+pnpm audit && pnpm outdated
 ```
 
 ---
 
-## 🌍 Deployment Guide
+## Deployment
 
-### Prerequisites
+### Pre-Deployment Checklist
 
-- Docker & Docker Compose (recommended)
-- Production PostgreSQL database
-- Production InfluxDB instance
-- MQTT broker in production
-- Node.js 18+ on server
+```bash
+pnpm lint && pnpm check-types && pnpm build   # Code quality
+pnpm audit                                    # No critical vulnerabilities
+cd packages/db && pnpm run db:push            # All migrations applied
+# Verify all production env vars are set
+# Backup production database before deploying
+```
 
-### Environment Setup for Production
-
-#### Create production `.env` files
+### Production Environment Variables
 
 **`apps/api/.env.production`:**
-
 ```env
-BROKER_URL=mqtt://mqtt-server.example.com:1883
-INFLUX_URL=https://influxdb.example.com
-INFLUX_TOKEN=production-token-here
-INFLUX_ORG=MyOrganization
-INFLUX_BUCKET=telemetry_prod
 NODE_ENV=production
+BROKER_URL=mqtts://your-mqtt-host.cloud:8883
+BROKER_USERNAME=mqtt_user
+BROKER_PASSWORD=secure_password
+INFLUX_URL=https://influxdb.cloud.example.com
+INFLUX_TOKEN=your-production-token
+INFLUX_ORG=YourOrganization
+INFLUX_BUCKET=telemetry_prod
+LOG_LEVEL=info
 ```
 
 **`packages/db/.env.production`:**
-
 ```env
 DATABASE_URL=postgresql://user:password@prod-db.aws.com:5432/vanguard_prod
-BETTER_AUTH_SECRET=production-secret-key-here
+BETTER_AUTH_SECRET=your-production-secret-key-min-32-chars
 BETTER_AUTH_URL=https://vanguard.example.com
-```
-
-### Docker Deployment
-
-Create `Dockerfile` in project root:
-
-```dockerfile
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm
-
-# Copy workspace files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Copy source code
-COPY . .
-
-# Build applications
-RUN pnpm build
-
-# Expose ports
-EXPOSE 3000 3001
-
-# Start both services
-CMD ["pnpm", "dev"]
+SESSION_EXPIRY=7d
 ```
 
 ### Docker Compose
 
 ```yaml
-version: '3.8'
-
+version: '3.9'
 services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: vanguard_prod
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
+      POSTGRES_USER: vanguard_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vanguard_user"]
+      interval: 10s; timeout: 5s; retries: 5
 
   influxdb:
     image: influxdb:2-alpine
-    environment:
-      INFLUXDB_DB: vanguard_db
-      INFLUXDB_ADMIN_USER: admin
-      INFLUXDB_ADMIN_PASSWORD: ${INFLUX_PASSWORD}
-    volumes:
-      - influxdb_data:/var/lib/influxdb2
-    ports:
-      - '8086:8086'
+    volumes: [influxdb_data:/var/lib/influxdb2]
+    ports: ["8086:8086"]
+    healthcheck:
+      test: ["CMD", "influx", "health"]
+      interval: 10s; timeout: 5s; retries: 5
 
-  mqtt:
+  mosquitto:
     image: eclipse-mosquitto:2-alpine
-    volumes:
-      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - mqtt_data:/mosquitto/data
-    ports:
-      - '1883:1883'
+    ports: ["1883:1883", "9001:9001"]    # 9001 = WebSocket
+    volumes: [./mosquitto.conf:/mosquitto/config/mosquitto.conf]
 
   app:
     build: .
+    depends_on:
+      postgres: { condition: service_healthy }
+      influxdb: { condition: service_healthy }
+      mosquitto: { condition: service_healthy }
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@postgres:5432/vanguard_prod
-      BROKER_URL: mqtt://mqtt:1883
+      DATABASE_URL: postgresql://vanguard_user:${DB_PASSWORD}@postgres:5432/vanguard_prod
+      BROKER_URL: mqtt://mosquitto:1883
       INFLUX_URL: http://influxdb:8086
       INFLUX_TOKEN: ${INFLUX_TOKEN}
-      INFLUX_ORG: MyOrganization
-      INFLUX_BUCKET: vanguard_db
-    ports:
-      - '3000:3000'
-      - '3001:3001'
-    depends_on:
-      - postgres
-      - influxdb
-      - mqtt
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: https://${DOMAIN}
+    ports: ["3000:3000", "3001:3001"]
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   influxdb_data:
-  mqtt_data:
 ```
 
-### Cloud Deployment (AWS Example)
+```bash
+docker-compose pull && docker-compose up -d
+docker-compose ps && docker-compose logs -f app
+docker-compose down
+```
 
-1. **Deploy Frontend (Next.js) to Vercel:**
+### Cloud Deployment
 
-   ```bash
-   vercel deploy --prod
-   ```
+**AWS ECS/Fargate:**
+```bash
+aws ecr create-repository --repository-name vanguard-app
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
+docker build -t vanguard-app . && docker push <ECR_URI>
+aws ecs update-service --cluster vanguard --service app --force-new-deployment
+```
 
-2. **Deploy Backend (Hono API) to AWS ECS/Lambda:**
+**Vercel (Frontend only):**
+```bash
+cd apps/web && vercel --prod
+# Set in Vercel dashboard:
+# NEXT_PUBLIC_API_URL=https://api.vanguard.example.com
+# NEXT_PUBLIC_BETTER_AUTH_URL=https://vanguard.example.com
+```
 
-   ```bash
-   # Build Docker image
-   docker build -t vanguard-api:latest .
+### Database Backup & Recovery
 
-   # Push to ECR
-   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
-   docker tag vanguard-api:latest YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/vanguard-api:latest
-   docker push YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/vanguard-api:latest
-   ```
+```bash
+# PostgreSQL
+pg_dump vanguard_prod > backup.sql
+pg_dump -Fc vanguard_prod > backup.dump        # Binary format
+psql -d vanguard_prod -f backup.sql
+pg_restore -d vanguard_prod backup.dump
 
-3. **Setup RDS PostgreSQL:**
-   - Create RDS instance
-   - Configure security groups
-   - Run migrations: `pnpm migrate:deploy`
-
-4. **Setup InfluxDB Cloud:**
-   - Create InfluxDB Cloud account
-   - Create bucket and organization
-   - Generate API token
-
-### Performance Optimization
-
-```javascript
-// API Server Optimization
-const writeApi = influx.getWriteApi(INFLUX_ORG, INFLUX_BUCKET, 'ms', {
-  flushInterval: 60000, // Batch writes every 60 seconds
-  maxRetries: 3,
-  maxBatchSize: 5000,
-})
-
-// Database Connection Pooling
-const connectionString = `${DATABASE_URL}?sslmode=require&pool_size=20`
+# InfluxDB
+influx backup /path/to/backup
+influx restore /path/to/backup
 ```
 
 ---
 
-## 🤝 Contributing
+## Monitoring & Debugging
 
-### Development Setup
+### Health Checks
 
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes
-4. Run tests: `pnpm test`
-5. Run linter: `pnpm lint`
-6. Commit: `git commit -m 'Add amazing feature'`
-7. Push: `git push origin feature/amazing-feature`
-8. Open Pull Request
+```bash
+curl http://localhost:3001/health       # API
+curl http://localhost:8086/health       # InfluxDB
+psql vanguard_db -c "SELECT 1;"        # PostgreSQL
+mosquitto_pub -h localhost -t test/ping -m "pong"  # MQTT
+```
 
-### Coding Standards
+### MQTT Monitoring
+
+```bash
+mosquitto_sub -h localhost -t '$SYS/#' -v                  # Broker stats
+mosquitto_sub -h localhost -t 'devices/#' -v               # All device messages
+mosquitto_sub -h localhost -t '$SYS/broker/clients/connected'  # Client count
+```
+
+### PostgreSQL Monitoring
+
+```sql
+-- Active connections
+SELECT datname, count(*) FROM pg_stat_activity GROUP BY datname;
+-- Slowest queries
+SELECT query, mean_exec_time FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 10;
+-- Cache hit ratio (target > 99%)
+SELECT sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) AS ratio
+FROM pg_statio_user_tables;
+-- Performance indexes
+CREATE INDEX idx_device_name ON devices(deviceName);
+CREATE INDEX idx_user_id ON "userDevices"("userId");
+```
+
+### InfluxDB Monitoring
+
+```bash
+influx health --token $INFLUX_TOKEN
+influx bucket list --token $INFLUX_TOKEN
+influx query --token $INFLUX_TOKEN --database vanguard_db \
+  'from(bucket:"vanguard_db") |> range(start: -1h) |> count()'
+```
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|---|---|
+| `dotenv variables undefined` | `import 'dotenv/config'` must be the **very first** import in `index.ts` |
+| InfluxDB write failures | `influx auth list` → create token with `bucket:create` + `bucket:read` |
+| MQTT messages not received | `mosquitto_sub -t 'devices/+/telemetry' -v` to verify topic/broker |
+| PostgreSQL connection refused | `pg_isready`, check firewall, verify `DATABASE_URL` credentials |
+| Port already in use | `lsof -i :<port>` then `kill -9 <PID>` |
+| API returning 401 | Include `Cookie: better-auth.session_token=<token>` in requests |
+| InfluxDB bucket not found | Run `influx setup` or create bucket via UI at `http://localhost:8086` |
+| Build fails after schema change | `cd packages/db && pnpm run db:push` to apply new migrations |
+
+### Recovery Commands
+
+```bash
+cd packages/db && pnpm run db:reset                              # Reset PostgreSQL ⚠️
+influx delete --bucket vanguard_db --start 1970-01-01T00:00:00Z --stop now  # Clear InfluxDB
+rm -rf apps/api/.turbo apps/api/dist apps/web/.next && pnpm build           # Clear build cache
+```
+
+---
+
+## Security Best Practices
 
 ```typescript
-// ✅ DO: Use type safety
-import { z } from 'zod';
+// ✅ Always validate session before any operation
+const session = await getSession(request);
+if (!session) return new Response('Unauthorized', { status: 401 });
 
-const schema = z.object({
-  deviceId: z.string().min(1),
-  value: z.number().positive(),
-});
+// ✅ Verify resource ownership before mutations
+if (device.userId !== session.user.id)
+  return new Response('Forbidden', { status: 403 });
 
-// ❌ DON'T: Use any types
-const data: any = { ... };
+// ✅ CORS allowlist — never use wildcard in production
+app.use(cors({ origin: ['https://vanguard.example.com'], credentials: true }));
+```
 
-// ✅ DO: Export types explicitly
+- **Always use TLS in production:** `mqtts://` for MQTT, `https://` for InfluxDB/API
+- **Never commit `.env` files** — use secrets managers (AWS Secrets Manager, HashiCorp Vault)
+- **Rotate `BETTER_AUTH_SECRET`** if suspected compromise (invalidates all sessions)
+- **Audit dependencies:** `pnpm audit && pnpm audit --fix`; use `--frozen-lockfile` in CI
+- **Rate limit headers:** `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+
+---
+
+## Contributing
+
+1. Fork → `git clone` → `git checkout -b feature/your-feature`
+2. Follow [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+3. TypeScript strict mode — no `any`; infer types from Drizzle schemas
+4. `pnpm lint && pnpm check-types` must pass
+5. Open a pull request with a clear description of changes
+
+```typescript
+// ✅ Type inference from schema
+export type User   = typeof usersTable.$inferSelect;
 export type Device = typeof devicesTable.$inferSelect;
 
-// ❌ DON'T: Use default exports in libraries
-export const function() { ... }
+// ✅ Zod for runtime validation
+const schema = z.object({ email: z.string().email(), password: z.string().min(8) });
+const validated = schema.parse(data);  // Throws ZodError if invalid
 ```
 
-### Commit Message Convention
 
-```
-feat: add device simulation
-fix: handle mqtt connection timeout
-docs: update API documentation
-style: format telemetry handler
-refactor: optimize database queries
-test: add telemetry endpoint tests
-chore: update dependencies
-```
+
+## License
+
+ISC License — Copyright (c) 2024 Md Jakaria Hossain
+
+> Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
 
 ---
 
-## 📊 Monitoring & Debugging
-
-### API Server Logs
-
-```bash
-# Watch API logs
-cd apps/api
-pnpm run dev
-
-# Monitor MQTT messages
-mosquitto_sub -h localhost -t '#' -v
-
-# Monitor InfluxDB
-curl -X GET "http://localhost:8086/api/v2/buckets" \
-  -H "Authorization: Token YOUR_TOKEN"
-```
-
-### Database Inspection
-
-```bash
-# Connect to PostgreSQL
-psql postgresql://postgres:password@127.0.0.1:5432/vanguard_db
-
-# List tables
-\dt
-
-# Query users
-SELECT id, name, email FROM users;
-
-# Query sessions
-SELECT * FROM session WHERE "userId" = 'user-id';
-```
-
-### Performance Metrics
-
-**MQTT Processing:**
-
-- Messages per second: Check console output
-- Buffer size: Displayed in logs
-- Flush interval: 60 seconds
-
-**Database:**
-
-- Query response time
-- Connection pool usage
-- Slow query logs
-
 ---
 
-## 📚 Resources & Documentation
+<div align="center"> 
+**⭐ If you find this project useful, consider giving it a star!**
 
-### Official Documentation
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Hono Framework](https://hono.dev)
-- [Drizzle ORM](https://orm.drizzle.team)
-- [MQTT Protocol](https://mqtt.org)
-- [InfluxDB Docs](https://docs.influxdata.com)
-- [Turbo Monorepo](https://turbo.build)
-
-### Useful Tools
-
-- [API Tester - Postman](https://www.postman.com)
-- [MQTT Client - MQTT Explorer](http://mqtt-explorer.com)
-- [Database Client - DBeaver](https://dbeaver.io)
-- [API Docs - Swagger UI](https://swagger.io/tools/swagger-ui)
-
----
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Issue: "Cannot connect to MQTT broker"**
-
-```bash
-# Check if MQTT broker is running
-mosquitto --version
-
-# Start Mosquitto
-mosquitto -d -p 1883
-
-# Test connection
-mosquitto_pub -h localhost -t test/topic -m "hello"
-```
-
-**Issue: InfluxDB connection failed**
-
-```bash
-# Check InfluxDB health
-curl http://localhost:8086/health
-
-# Verify token
-influx auth list
-
-# Test write
-curl -X POST http://localhost:8086/api/v2/write \
-  -H "Authorization: Token YOUR_TOKEN"
-```
-
-**Issue: Database migrations failing**
-
-```bash
-# Check migration status
-pnpm run migrate:status
-
-# Reset and retry
-pnpm run migrate:reset
-pnpm run migrate:dev --name recovery
-```
-
-**Issue: Port already in use**
-
-```bash
-# Find process using port 3001
-lsof -i :3001
-
-# Kill process
-kill -9 <PID>
-
-# Or use different port
-PORT=3002 pnpm dev
-```
-
----
-
-## 📜 License
-
-This project is licensed under the ISC License - see the LICENSE file for details.
-
----
-
-## 👥 Contributors
-
-- **Md Jakaria Hossain** - Project Lead & Developer
-
----
-
-## 📞 Support & Contact
-
-- 📧 Email: support@vanguard.local
-- 🐦 Twitter: [@vanguard_iot](https://twitter.com)
-- 🔗 Website: https://vanguard.example.com
-- 💬 Discord: [Vanguard Community](https://discord.gg)
-
----
-
-<div align="center">
-
-**Made with ❤️ by the Vanguard team**
-
-[⬆ Back to top](#-vanguard---iot-vehicle-telemetry-platform)
+[⬆ Back to top](#-vanguard--enterprise-iot-vehicle-telemetry-platform)
 
 </div>

@@ -76,37 +76,37 @@ const startInfluxFlushLoop = () => {
     messageBuffer = []
 
     try {
-      // for (const item of batch) {
-      //   // --- timestamp handling ---
-      //   const ts = new Date(item.timestamp)
-      //   if (isNaN(ts.getTime())) {
-      //     console.warn('Invalid timestamp for device', item.device_id, item.timestamp)
-      //     continue
-      //   }
+      for (const item of batch) {
+        // --- timestamp handling ---
+        const ts = new Date(item.timestamp)
+        if (isNaN(ts.getTime())) {
+          console.warn('Invalid timestamp for device', item.device_id, item.timestamp)
+          continue
+        }
 
-      //   // ✅ USE EXPLICIT MILLISECONDS
-      //   const timestampMs = ts.getTime()
+        // ✅ USE EXPLICIT MILLISECONDS
+        const timestampMs = ts.getTime()
 
-      //   const point = new Point('device_telemetry')
-      //     .tag('device_id', item.device_id)
-      //     .tag('status', item.status)
-      //     .floatField('latitude', item.latitude)
-      //     .floatField('longitude', item.longitude)
-      //     .floatField('altitude', item.altitude)
-      //     .floatField('speed', item.speed)
-      //     .floatField('accuracy', item.accuracy)
-      //     .floatField('temperature', item.temperature)
-      //     .intField('heading', item.heading)
-      //     .intField('satellites', item.satellites)
-      //     .intField('battery_level', item.battery_level)
-      //     .intField('signal_strength', item.signal_strength)
-      //     .booleanField('charging', item.charging)
-      //     .timestamp(timestampMs)
+        const point = new Point('device_telemetry')
+          .tag('device_id', item.device_id)
+          .tag('status', item.status)
+          .floatField('latitude', item.latitude)
+          .floatField('longitude', item.longitude)
+          .floatField('altitude', item.altitude)
+          .floatField('speed', item.speed)
+          .floatField('accuracy', item.accuracy)
+          .floatField('temperature', item.temperature)
+          .intField('heading', item.heading)
+          .intField('satellites', item.satellites)
+          .intField('battery_level', item.battery_level)
+          .intField('signal_strength', item.signal_strength)
+          .booleanField('charging', item.charging)
+          .timestamp(timestampMs)
 
-      //   writeApi.writePoint(point)
-      // }
+        writeApi.writePoint(point)
+      }
 
-      // await writeApi.flush()
+      await writeApi.flush()
       console.log(`🚀 InfluxDB: Wrote ${batch.length} points`)
     } catch (err) {
       console.error('❌ Influx flush failed:', err)
