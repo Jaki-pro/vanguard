@@ -8,3 +8,10 @@ pnpm-debug.log
 coverage
 dist
 build
+.env
+.env.*
+!.env.example
+*.log
+.vscode
+.idea
+docs/

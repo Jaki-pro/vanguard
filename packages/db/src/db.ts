@@ -1,6 +1,5 @@
-import 'dotenv/config'
 import { drizzle } from 'drizzle-orm/postgres-js'
-console.log('db string => ', process.env.DATABASE_URL!)
-export const db = drizzle(
-  'postgresql://postgres:password@localhost:5432/vanguard_db'
-)
+import postgres from 'postgres'
+
+const client = postgres(process.env.DATABASE_URL!)
+export const db = drizzle(client)

@@ -3,7 +3,6 @@
 
 -- Create extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 
 -- Create custom types if needed
 -- (Better-Auth creates tables automatically)

@@ -22,7 +22,7 @@ export const getTelemetryByDeviceId: RouteHandler<
 
     const query = `
       from(bucket: "${INFLUX_BUCKET}")
-        |> range(start: 2026-02-07T00:00:00Z)
+        |> range(start: -24h)
         |> filter(fn: (r) => r._measurement == "device_telemetry")
         |> filter(fn: (r) => r.device_id == "${device_id}")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
